@@ -9,6 +9,8 @@
             --primary-green: #3a5a40;
             --accent-green: #588157;
             --light-green: #a3b18a;
+            --mint-btn-bg: #d8e8d8;
+            --mint-btn-hover: #b5d5b5;
             --warm-cream: #f4f1de;
             --soft-white: rgba(255, 255, 255, 0.95);
             --dark-text: #2f3e46;
@@ -57,15 +59,20 @@
         header {
             background-color: rgba(58, 90, 64, 0.92);
             color: #fff;
-            padding: 1.5rem 2rem;
+            padding: 1.2rem 2rem;
             backdrop-filter: blur(6px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             position: sticky;
             top: 0;
             z-index: 100;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
+            gap: 12px;
+        }
+
+        .header-title {
+            text-align: center;
         }
 
         .header-title h1 {
@@ -77,10 +84,57 @@
         .header-title p {
             font-size: 0.9rem;
             color: var(--light-green);
+            margin-top: 2px;
         }
 
-        /* 右上角購物車按鈕 (已移除圖示，名稱改為購物車) */
+        /* 中間列：包含置中的分類按鈕與定位於右側的購物車 */
+        .nav-bar {
+            width: 100%;
+            max-width: 1280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 淡綠色分類篩選按鈕 - 強制置中 */
+        .filter-btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--mint-btn-bg);
+            color: #2b4530;
+            border: 1px solid #b2ceb2;
+            padding: 0.55rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .filter-btn:hover {
+            background: var(--mint-btn-hover);
+            transform: translateY(-1px);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-green);
+            color: #ffffff;
+            border-color: var(--primary-green);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 右上角購物車按鈕 (絕對定位於右邊，不影響按鈕置中) */
         .cart-btn-container {
+            position: absolute;
+            right: 0;
             cursor: pointer;
             background: var(--accent-green);
             padding: 0.6rem 1.2rem;
@@ -90,6 +144,7 @@
             gap: 8px;
             color: white;
             transition: background 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .cart-btn-container:hover {
@@ -103,6 +158,17 @@
             font-weight: bold;
             border-radius: 50%;
             padding: 2px 7px;
+        }
+
+        /* 響應式調整：螢幕較窄時購物車回歸自然排列 */
+        @media (max-width: 768px) {
+            .nav-bar {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .cart-btn-container {
+                position: static;
+            }
         }
 
         .container {
@@ -127,9 +193,13 @@
             flex-direction: column;
             border: 1px solid rgba(163, 177, 138, 0.4);
             backdrop-filter: blur(8px);
+            transition: transform 0.25s ease, opacity 0.25s ease;
         }
 
-        /* 圖片僅展示，非按鈕 */
+        .product-card:hover {
+            transform: translateY(-4px);
+        }
+
         .product-img {
             width: 100%;
             height: 200px;
@@ -142,6 +212,19 @@
             display: flex;
             flex-direction: column;
             flex-grow: 1;
+        }
+
+        .product-category-tag {
+            display: inline-block;
+            align-self: flex-start;
+            background: #eaf2ea;
+            color: #3a5a40;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #c2dac2;
         }
 
         .product-title {
@@ -345,7 +428,7 @@
             background: #b85431;
         }
 
-        /* 購物車側邊 Drawer - 已將背景改為淡紫色 (var(--purple-bg)) */
+        /* 購物車側邊 Drawer */
         .cart-drawer {
             position: fixed;
             top: 0;
@@ -446,7 +529,7 @@
             background: var(--accent-green);
         }
 
-        /* 結帳付費彈窗 - 背景淡紫色設定 */
+        /* 結帳付費彈窗 */
         .modal-content-checkout {
             background: var(--purple-bg);
             width: 90%;
@@ -524,10 +607,20 @@
             <h1>Nordic Herb Studio</h1>
             <p>北歐植物工坊 ‧ 30種純淨嚴選香草品種</p>
         </div>
-        <!-- 右上角改為單純名稱「購物車」，並保留數量標籤 -->
-        <div class="cart-btn-container" onclick="toggleCart()">
-            <span>購物車</span>
-            <span class="cart-count" id="cartCount">0</span>
+        
+        <!-- 下方列：置中分類按鈕 + 右側購物車按鈕 -->
+        <div class="nav-bar">
+            <div class="filter-btn-group">
+                <button class="filter-btn active" onclick="filterCategory('all', this)">全部商品</button>
+                <button class="filter-btn" onclick="filterCategory('茶飲香草', this)">茶飲香草</button>
+                <button class="filter-btn" onclick="filterCategory('料理香草', this)">料理香草</button>
+                <button class="filter-btn" onclick="filterCategory('芳香觀賞', this)">芳香觀賞</button>
+            </div>
+            
+            <div class="cart-btn-container" onclick="toggleCart()">
+                <span>購物車</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
         </div>
     </header>
 
@@ -571,7 +664,7 @@
         </div>
     </div>
 
-    <!-- 購物車 Drawer (背景已調為淡紫色) -->
+    <!-- 購物車 Drawer -->
     <div class="cart-drawer" id="cartDrawer">
         <div class="cart-header">
             <h2>您的購物車</h2>
@@ -622,155 +715,238 @@
         // 30項真實香草資料
         const products = [
             {
-                id: 1, name: "甜墨角蘭 (瑪鬱蘭)", latin: "Origanum majorana · 料理香草", price: 260,
+                id: 1, name: "甜墨角蘭 (瑪鬱蘭)", category: "料理香草", latin: "Origanum majorana · 料理香草", price: 260,
                 sun: "日照：全日照", water: "水分：乾燥澆透", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "墨角蘭比起牛至擁有更為溫和甜蜜、帶有淡淡柑橘與花香的香氣。是法式與德式傳統料理中的精緻調味靈魂。",
-                fullDesc: "墨角蘭比起牛至擁有更為溫和甜蜜、帶有淡淡柑橘與花香的香氣。是法式與德式傳統香腸、肉醬與蔬菜濃湯中的精緻調味靈魂。柔軟撫媚的植株型態與柔和香氣，能為家庭料理帶來優雅豐富的層次感。\n\n【栽培與應用】甜墨角蘭喜好溫暖且陽光充足的環境，排水良好的土壤是生長關鍵。在烹飪應用上，因其香味較為細緻，建議在料理即將起鍋前加入，能完美保留其溫柔柑橘與甜蜜花草香。乾燥後的墨角蘭亦常用於調配西式複合香草鹽，或作為夜晚舒壓茶飲。"
+                fullDesc: "墨角蘭比起牛至擁有更為溫和甜蜜、帶有淡淡柑橘與花香的香氣。是法式與德式傳統香腸、肉醬與蔬菜濃湯中的精緻調味靈魂。柔軟撫媚的植株型態與柔和香氣，能為家庭料理帶來優雅豐富的層次感。"
             },
             {
-                id: 2, name: "甜羅勒 (Sweet Basil)", latin: "Ocimum basilicum · 料理香草", price: 190,
+                id: 2, name: "甜羅勒 (Sweet Basil)", category: "料理香草", latin: "Ocimum basilicum · 料理香草", price: 190,
                 sun: "日照：全日照", water: "水分：保持濕潤", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1618164436241-4473940d1f5c?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "義式料理靈魂夥伴，葉片柔軟寬大，富含甜美茴香與溫和丁香香氣，是製作正宗義大利青醬的核心主角。",
-                fullDesc: "甜羅勒是地中海飲食文化中最具代表性的香草之一。與台式九層塔相比，甜羅勒的葉片更為柔軟寬大，風味溫柔甜美，帶有淡淡的茴香與丁香氣息，完全不帶嗆辣感。\n\n【栽培與應用】極度喜好陽光與高溫環境，適合春夏生長。土壤保持微濕但不積水即可蓬勃發展。甜羅勒是製作經典熱那亞青醬（Pesto）的主要原料，只需將鮮採葉片與松子、蒜頭、帕馬森起司及橄欖油打碎即可。與鮮採蕃茄、起司片搭配製作莫札瑞拉沙拉也是絕配。"
+                fullDesc: "甜羅勒是地中海飲食文化中最具代表性的香草之一。與台式九層塔相比，甜羅勒的葉片更為柔軟寬大，風味溫柔甜美，帶有淡淡的茴香與丁香氣息，完全不帶嗆辣感。"
             },
             {
-                id: 3, name: "胡椒薄荷 (Peppermint)", latin: "Mentha × piperita · 茶飲/藥用", price: 180,
+                id: 3, name: "胡椒薄荷 (Peppermint)", category: "茶飲香草", latin: "Mentha × piperita · 茶飲/藥用", price: 180,
                 sun: "日照：半日照", water: "水分：水分充足", level: "難易度：極易上手",
                 img: "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "含有高濃度薄荷腦，口感極致涼爽清冽。非常適合調製夏日冰飲、調酒、甜點裝飾與幫助舒緩消化不適。",
-                fullDesc: "胡椒薄荷為水薄荷與綠薄荷雜交的多年生草本植物，具有強烈清涼香氣與微微辛辣後味。其高含量的薄荷腦成分使其成為全世界最受歡迎的舒緩香草。\n\n【栽培與應用】生命力極強，喜歡半日照與濕潤環境。由於根系擴展迅速，建議獨立盆栽種植。摘採新鮮葉片沖泡熱水或冰鎮飲用，能快速提神醒腦並舒緩消化負擔。亦非常適合用於製作Mojito調酒、薄荷巧克力甜點裝飾或檸檬氣泡水。"
+                fullDesc: "胡椒薄荷為水薄荷與綠薄荷雜交的多年生草本植物，具有強烈清涼香氣與微微辛辣後味。其高含量的薄荷腦成分使其成為全世界最受歡迎的舒緩香草。"
             },
             {
-                id: 4, name: "原生百里香 (Thyme)", latin: "Thymus vulgaris · 西式燉煮", price: 220,
+                id: 4, name: "原生百里香 (Thyme)", category: "料理香草", latin: "Thymus vulgaris · 西式燉煮", price: 220,
                 sun: "日照：全日照", water: "水分：乾燥澆透", level: "難易度：中等挑戰",
                 img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "細小葉片蘊含深沉草本辛香，法式燉煮靈魂香草之一，能完美提昇湯品、烤雞與高湯肉類的風味層次。",
-                fullDesc: "百里香又稱麝香草，是法式經典香草束（Bouquet Garni）的核心主角。小巧玲瓏的葉片蘊含深沉濃郁的草本辛香，即使長時間高溫慢燉依然能持久留香。\n\n【栽培與應用】喜歡溫暖乾燥、日光充足與排水極佳的環境，最忌高溫多濕及積水。百里香適合用於法式紅酒燉牛肉、烤雞、橄欖油煎干貝及高湯濃湯。此外，百里香含有百里香酚（Thymol），具有天然抗菌效果，沖泡香草茶有助於呼吸道保養。"
+                fullDesc: "百里香又稱麝香草，是法式經典香草束（Bouquet Garni）的核心主角。小巧玲瓏的葉片蘊含深沉濃郁的草本辛香，即使長時間高溫慢燉依然能持久留香。"
             },
             {
-                id: 5, name: "德國洋甘菊 (Chamomile)", latin: "Matricaria chamomilla · 舒壓茶飲", price: 200,
+                id: 5, name: "德國洋甘菊 (Chamomile)", category: "茶飲香草", latin: "Matricaria chamomilla · 舒壓茶飲", price: 200,
                 sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "小白花宛如暖陽般可愛，散發清甜蘋果香味。是廣為人知的夜晚舒壓、撫平情緒與溫暖脾胃的養生香草。",
-                fullDesc: "德國洋甘菊為一或二年生草本植物，羽狀細裂的葉片間會開出白色花瓣、黃色花心的小巧雛菊。花朵會散發類似新鮮甜蘋果的誘人甜香，自古被譽為「大地的蘋果」。\n\n【栽培與應用】適合秋季或春季播種，喜好涼爽充足的陽光。採收盛開的花朵乾燥後保存，是調製睡前無咖啡因花草茶的最高選擇。洋甘菊茶口感甘甜溫熱，能撫平緊張神經、舒緩胃部壓力並促進深層睡眠，萃取物亦常應用於護膚保養。"
+                fullDesc: "德國洋甘菊為一或二年生草本植物，羽狀細裂的葉片間會開出白色花瓣、黃色花心的小巧雛菊。花朵會散發類似新鮮甜蘋果的誘人甜香，自古被譽為「大地的蘋果」。"
             },
             {
-                id: 6, name: "直立迷迭香 (Rosemary)", latin: "Salvia rosmarinus · 煎烤香草", price: 250,
+                id: 6, name: "直立迷迭香 (Rosemary)", category: "料理香草", latin: "Salvia rosmarinus · 煎烤香草", price: 250,
                 sun: "日照：全日照", water: "水分：乾燥澆透", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "松針般獨特的強烈木質清香，富含抗氧化成分。常用於牛排煎烤、烤馬鈴薯與麵包，極具觀賞價值。",
-                fullDesc: "直立迷迭香屬於唇形科常綠灌木，擁有如松針般堅挺的葉片與獨特濃郁的木質松香。在花園中極具線條美感，同時也是頂級西餐廚房不可或缺的煎烤必備香草。\n\n【栽培與應用】極度喜好充足陽光與通風乾燥環境，對土質要求低但排水需極佳。迷迭香與牛排、羊排、煎馬鈴薯及佛卡夏麵包是絕配，油脂高溫煎烤後會釋放誘人香氣。新鮮枝條亦可浸泡香草橄欖油或沖泡提神香草茶。"
+                fullDesc: "直立迷迭香屬於唇形科常綠灌木，擁有如松針般堅挺的葉片與獨特濃郁的木質松香。在花園中極具線條美感，同時也是頂級西餐廚房不可或缺的煎烤必備香草。"
             },
             {
-                id: 7, name: "甜蜜薰衣草 (Lavender)", latin: "Lavandula heterophylla · 芳香/觀賞", price: 280,
+                id: 7, name: "甜蜜薰衣草 (Lavender)", category: "芳香觀賞", latin: "Lavandula heterophylla · 芳香/觀賞", price: 280,
                 sun: "日照：全日照", water: "水分：乾燥澆透", level: "難易度：中等挑戰",
                 img: "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "優雅紫色花穗伴隨療癒甜蜜花香，具備顯著舒緩放鬆與助眠效果，適合陽台栽種與乾燥花藝手作。",
-                fullDesc: "甜蜜薰衣草以其柔和的甜蜜花香與優雅紫色花穗著稱，是居家與庭園中最受歡迎的觀賞與療癒植物。盛開時散發能平撫情緒、減緩焦慮的天然芳香。\n\n【栽培與應用】喜好通風良好、充足陽光及偏鹼性透氣土質。需特別注意夏季高溫避雨避暑。摘採乾燥的花穗可製成香包放在枕邊助眠，或用於沖泡舒壓薰衣草茶。花朵亦可用於烘焙餅乾、製作甜點或揉入手工皂中。"
+                fullDesc: "甜蜜薰衣草以其柔和的甜蜜花香與優雅紫色花穗著稱，是居家與庭園中最受歡迎的觀賞與療癒植物。盛開時散發能平撫情緒、減緩焦慮的天然芳香。"
             },
             {
-                id: 8, name: "巴爾幹鼠尾草 (Sage)", latin: "Salvia officinalis · 料理/保健", price: 240,
+                id: 8, name: "巴爾幹鼠尾草 (Sage)", category: "料理香草", latin: "Salvia officinalis · 料理/保健", price: 240,
                 sun: "日照：全日照", water: "水分：乾燥澆透", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "絨毛銀灰葉片帶有溫和樟腦與樟木沉香，廣泛用於豬肉、禽肉去腥調味，並具天然保鮮與保養功效。",
-                fullDesc: "巴爾幹鼠尾草（藥用鼠尾草）擁有天鵝絨質感的銀灰色葉片，散發溫暖而沉穩的草本樟香。自古歐洲便有「家有鼠尾草，長壽不用找」的讚譽，是集健康與料理於一身的植物。\n\n【栽培與應用】喜好陽光充足與乾燥環境，忌過度澆水。鼠尾草能完美中和豬肉、香腸與鵝肉的油脂膩感，經典義式料理「奶油鼠尾草醬煎豬排」便是最佳代表。將其葉片浸泡熱水加蜂蜜飲用，亦能舒緩喉嚨不適。"
+                fullDesc: "巴爾幹鼠尾草（藥用鼠尾草）擁有天鵝絨質感的銀灰色葉片，散發溫暖而沉穩的草本樟香。自古歐洲便有「家有鼠尾草，長壽不用找」的讚譽。"
             },
             {
-                id: 9, name: "檸檬香蜂草 (Lemon Balm)", latin: "Melissa officinalis · 茶飲舒壓", price: 210,
+                id: 9, name: "檸檬香蜂草 (Lemon Balm)", category: "茶飲香草", latin: "Melissa officinalis · 茶飲舒壓", price: 210,
                 sun: "日照：半日照", water: "水分：保持濕潤", level: "難易度：極易上手",
                 img: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "揉碎葉片會釋放出清新檸檬與甜美柑橘氣息。能有效放鬆緊繃心情，非常適合沖泡冷熱花草茶飲。",
-                fullDesc: "檸檬香蜂草又稱蜜蜂花，葉片外觀類似薄荷但帶有濃郁甜美的檸檬水果香氣。希臘人認為它是聖草，能為心靈帶來愉悅與平靜。\n\n【栽培與應用】適應力極強，半日照即可良好生長，喜歡溫和濕潤的土壤。摘採新鮮葉片直接沖泡熱水，即可享用一杯不帶酸味卻充滿檸檬香甜的舒壓茶。亦可用於甜點裝飾、調製水果 punch 雞尾酒或與魚肉料理搭配提升鮮味。"
+                fullDesc: "檸檬香蜂草又稱蜜蜂花，葉片外觀類似薄荷但帶有濃郁甜美的檸檬水果香氣。希臘人認為它是聖草，能為心靈帶來愉悅與平靜。"
             },
             {
-                id: 10, name: "檸檬馬鞭草 (Lemon Verbena)", latin: "Aloysia citrodora · 頂級茶飲", price: 290,
+                id: 10, name: "檸檬馬鞭草 (Lemon Verbena)", category: "茶飲香草", latin: "Aloysia citrodora · 頂級茶飲", price: 290,
                 sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "被譽為香草界檸檬香味極致的代表，細長葉片蘊含強烈醇厚的檸檬純香，是法式下午茶的高級茶飲。",
-                fullDesc: "檸檬馬鞭草原產於南美洲，其長披針形的葉片含有極高濃度的檸檬醛，純粹純淨的檸檬氣息遠勝於真正的檸檬皮，被公認是所有檸檬系香草中最頂級的種類。\n\n【栽培與應用】喜好溫暖陽光與排水良好的土質，冬季會落葉休眠。將其乾燥或新鮮葉片沖泡茶飲，茶湯呈現澄黃色澤，入口清甜且帶有持久檸檬餘韻，能有效幫助餐後消化並舒緩一天的疲憊感。"
+                fullDesc: "檸檬馬鞭草原產於南美洲，其長披針形的葉片含有極高濃度的檸檬醛，純粹純淨的檸檬氣息遠勝於真正的檸檬皮，被公認是所有檸檬系香草中最頂級的種類。"
             },
             {
-                id: 11, name: "貓薄荷 (Catnip)", latin: "Nepeta cataria · 寵物互動/茶飲", price: 170,
+                id: 11, name: "貓薄荷 (Catnip)", category: "芳香觀賞", latin: "Nepeta cataria · 寵物互動/茶飲", price: 170,
                 sun: "日照：半日照", water: "水分：適中澆透", level: "難易度：極易上手",
                 img: "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "含有天然荊芥內酯成分，能讓貓咪感受快樂與放鬆。人類沖泡飲用則帶有微甜草本香，能幫助放鬆。",
-                fullDesc: "貓薄荷屬於唇形科荊芥屬，葉片帶有微微薄荷與草本甘甜味。其揮發油中的荊芥內酯（Nepetalactone）能引起多數貓咪的歡愉反應，是風靡寵物界的明星植物。\n\n【栽培與應用】極易栽種，半日照與定期澆水即可生長茂盛。摘採葉片曬乾後可填入貓咪布偶手作玩具中。對於人類而言，貓薄荷茶具有溫和的鎮靜放鬆作用，適合睡前少量飲用。"
+                fullDesc: "貓薄荷屬於唇形科荊芥屬，葉片帶有微微薄荷與草本甘甜味。其揮發油中的荊芥內酯（Nepetalactone）能引起多數貓咪的歡愉反應。"
             },
             {
-                id: 12, name: "蒔蘿 (Dill)", latin: "Anethum graveolens · 海鮮調味", price: 190,
+                id: 12, name: "蒔蘿 (Dill)", category: "料理香草", latin: "Anethum graveolens · 海鮮調味", price: 190,
                 sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "羽狀細碎葉片帶有獨特茴香與溫和辛香，北歐料理中鮭魚與醃漬黃瓜不可或缺的黃金搭檔。",
-                fullDesc: "蒔蘿是北歐與東歐傳統飲食中的靈魂香草。其羽狀絲狀葉片纖細柔美，帶有類似茴香卻更為清爽的微辛香氣，能極完美地襯托出海鮮料理的鮮甜。\n\n【栽培與應用】喜好日光充足與通風良好的環境，根系為直根性不宜頻繁移植。蒔蘿與醃鮭魚（Gravlax）、煙燻鮭魚塔塔、美乃滋沾醬及酸黃瓜醃漬是經典絕配，亦可用於馬鈴薯沙拉添香。"
+                fullDesc: "蒔蘿是北歐與東歐傳統飲食中的靈魂香草。其羽狀絲狀葉片纖細柔美，帶有類似茴香卻更為清爽的微辛香氣，能極完美地襯托出海鮮料理的鮮甜。"
             },
             {
-                id: 13, name: "平葉義大利巴西里 (Parsley)", latin: "Petroselinum crispum · 萬用香料", price: 160,
+                id: 13, name: "平葉義大利巴西里 (Parsley)", category: "料理香草", latin: "Petroselinum crispum · 萬用香料", price: 160,
                 sun: "日照：半日照", water: "水分：保持濕潤", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1618164436241-4473940d1f5c?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "西餐萬用基礎香草，平葉風味比捲葉更為濃郁清香，富含維生素C，能大幅提升料理鮮味與視覺色澤。",
-                fullDesc: "平葉義大利巴西里（Parsley）是全球西式廚房使用率最高的綠色香草。比起裝飾用的捲葉巴西里，平葉巴西里的質地更為柔軟，草本清香更為突出且持久。\n\n【栽培與應用】喜好肥沃、濕潤且半日照的環境。可作為所有熱炒、燉菜、大蒜奶油醬、義大利麵起鍋前的萬用灑料，不僅能去除腥味，還能帶來生機盎然的視覺裝飾。"
+                fullDesc: "平葉義大利巴西里（Parsley）是全球西式廚房使用率最高的綠色香草。比起裝飾用的捲葉巴西里，平葉巴西里的質地更為柔軟，草本清香更為突出且持久。"
             },
             {
-                id: 14, name: "芝麻菜 (Arugula/Rucola)", latin: "Eruca vesicaria · 沙拉鮮採", price: 180,
+                id: 14, name: "芝麻菜 (Arugula/Rucola)", category: "料理香草", latin: "Eruca vesicaria · 沙拉鮮採", price: 180,
                 sun: "日照：半日照", water: "水分：水分充足", level: "難易度：極易上手",
                 img: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "嫩葉帶有獨特濃郁的堅果氣息與微微微辣感受，是義式生菜沙拉與窯烤披薩後鋪綠葉的頂級首選。",
-                fullDesc: "芝麻菜又稱火箭菜，是地中海高級餐館生菜沙拉的標配。其深裂羽狀葉片蘊含令人印象深刻的炒芝麻香氣與後段微辣感，極具味覺辨識度。\n\n【栽培與應用】生長極為迅速，採播種後約3-4週即可採收嫩葉。非常適合新鮮生食，淋上特級初榨橄欖油與摩德納黑醋，搭配帕馬森起司切片，或在現烤出爐的披薩上鋪滿芝麻菜即可享用。"
+                fullDesc: "芝麻菜又稱火箭菜，是地中海高級餐館生菜沙拉的標配。其深裂羽狀葉片蘊含令人印象深刻的炒芝麻香氣與後段微辣感，極具味覺辨識度。"
             },
             {
-                id: 15, name: "綠香蜂草 / 貓薄荷變種", latin: "Monarda didyma · 花茶觀賞", price: 230,
+                id: 15, name: "綠香蜂草 (美洲薄荷)", category: "茶飲香草", latin: "Monarda didyma · 花茶觀賞", price: 230,
                 sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
                 img: "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=600&q=80",
                 shortDesc: "又名佛手柑香草，盛開鮮豔花朵，葉片帶有獨特佛手柑氣息，是著名的伯爵茶調香成分來源之一。",
-                fullDesc: "綠香蜂草（美洲薄荷）原產於北美洲，開有極為誇張鮮艷的紅色或紫色花朵，葉片富含類似佛手柑柑橘香氣，自古美洲原住民便將其作為提神藥草茶。\n\n【栽培與應用】喜歡陽光充足與排水透氣的土質。葉片與花瓣皆可摘下沖泡花草茶，茶湯帶有淡淡伯爵茶風味，亦可用於甜點擺盤與盤飾視覺亮點。"
+                fullDesc: "綠香蜂草（美洲薄荷）原產於北美洲，開有極為誇張鮮艷的紅色或紫色花朵，葉片富含類似佛手柑柑橘香氣，自古美洲原住民便將其作為提神藥草茶。"
+            },
+            {
+                id: 16, name: "蝦夷蔥 (Chives)", category: "料理香草", latin: "Allium schoenoprasum · 細香蔥", price: 170,
+                sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "細長管狀葉片帶有細緻溫和的洋蔥細香，適合拌入奶油、歐姆蛋與湯品點綴提味。",
+                fullDesc: "蝦夷蔥細緻的溫和洋蔥香氣使其成為法式溫和香草（Fines Herbes）組合的核心之一，不會有生大蒜或洋蔥的刺鼻感。"
+            },
+            {
+                id: 17, name: "茵陳蒿 / 龍蒿 (Tarragon)", category: "料理香草", latin: "Artemisia dracunculus · 法式調味", price: 270,
+                sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：中等挑戰",
+                img: "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "法式四大法寶香草之一，帶有甘草與茴香的優雅獨特氣息，是法式蛋黃醬與雞肉料理的主角。",
+                fullDesc: "法國龍蒿被譽為「香草之王」，具有微甜的八角甘草風采，能為白肉、海鮮與蛋類料理增添法式頂級餐館的高雅質感。"
+            },
+            {
+                id: 18, name: "斑葉檸檬百里香", category: "芳香觀賞", latin: "Thymus citriodorus · 觀賞/料理", price: 230,
+                sun: "日照：全日照", water: "水分：乾燥澆透", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "金邊斑葉極具花園視覺觀賞性，兼具百里香草本辛香與檸檬清爽，適合煎魚與海鮮烤物。",
+                fullDesc: "金黃斑紋的葉片在陽光下閃耀明亮光澤，既是絕美的盆栽觀賞植物，揉碎葉片又能釋放令人神清氣爽的檸檬百里香氣。"
+            },
+            {
+                id: 19, name: "紫葉羅勒 (Purple Basil)", category: "芳香觀賞", latin: "Ocimum basilicum purpurascens · 觀賞/料理", price: 210,
+                sun: "日照：全日照", water: "水分：保持濕潤", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1618164436241-4473940d1f5c?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "深紫紅色的亮麗葉片極具視覺衝擊，氣味比綠羅勒稍微濃郁，浸泡香草醋可呈現迷人粉紅色澤。",
+                fullDesc: "深沉迷人的紫紫色葉片是庭園邊界與陽台組合盆栽的亮點，兼具豐富視覺饗宴與傳統羅勒的經典辛香風味。"
+            },
+            {
+                id: 20, name: "鳳梨鼠尾草 (Pineapple Sage)", category: "芳香觀賞", latin: "Salvia elegans · 芳香觀賞", price: 250,
+                sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "揉碎葉片會散發令人驚艷的熱帶鳳梨水果香氣，秋冬開出鮮紅花朵，極具景觀與療癒價值。",
+                fullDesc: "葉片撫摸時會釋放出濃郁無比的熱帶新鮮鳳梨果香，秋冬季節會抽長出耀眼奪目的管狀鮮紅花穗，是花園中最引人注目的景觀香草。"
+            },
+            {
+                id: 21, name: "甜香蘿勒 (Opal Basil)", category: "料理香草", latin: "Ocimum basilicum var. · 生菜輕食", price: 200,
+                sun: "日照：全日照", water: "水分：保持濕潤", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "溫和無辛辣感，口感清甜柔軟，適合直接撕碎加入夏日水果沙拉或義大利生菜盤中增添香氣。",
+                fullDesc: "葉片滑順柔嫩，帶有甜美的丁香與甘草餘香，完全不具嗆辣後勁，適合用於輕食沙拉、三明治與夏日冷盤點綴。"
+            },
+            {
+                id: 22, name: "蘋果薄荷 (Apple Mint)", category: "茶飲香草", latin: "Mentha suaveolens · 果香茶飲", price: 180,
+                sun: "日照：半日照", water: "水分：水分充足", level: "難易度：極易上手",
+                img: "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "圓潤天鵝絨微毛葉片，帶有青蘋果與薄荷混合的清甜感，適合沖泡冰鎮果香薄荷茶與甜點擺盤。",
+                fullDesc: "綠色葉片表面覆蓋著溫柔的微絨毛，觸感舒適，散發著淡淡的青蘋果香與清涼薄荷味，是無咖啡因水果薄荷茶的第一首選。"
+            },
+            {
+                id: 23, name: "巧克力薄荷 (Chocolate Mint)", category: "茶飲香草", latin: "Mentha x piperita 'Chocolate' · 甜香茶飲", price: 220,
+                sun: "日照：半日照", water: "水分：水分充足", level: "難易度：極易上手",
+                img: "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "深色葉脈與紫黑莖幹，帶有類似薄荷巧克力點心的甜美可可香氣，沖泡特調可可茶或烘焙必備。",
+                fullDesc: "深紫褐色莖幹搭配濃綠葉片，散發出宛如安地斯薄荷巧克力般的誘人可可甜香，非常適合加入鮮奶茶或可可飲料中沖泡。"
+            },
+            {
+                id: 24, name: "葡萄柚薄荷 (Grapefruit Mint)", category: "茶飲香草", latin: "Mentha piperita 'Grapefruit' · 柑橘冷飲", price: 220,
+                sun: "日照：半日照", water: "水分：水分充足", level: "難易度：極易上手",
+                img: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "寬大葉片散發出鮮明的柑橘與葡萄柚果香，調製冰涼氣泡水、水果茶極度解渴消薯。",
+                fullDesc: "擁有大型且厚實的深綠葉片，揉壓時會爆發出豐沛強烈的葡萄柚果皮精油香氣，沖泡冰氣泡水能帶來無與倫比的爽快體驗。"
+            },
+            {
+                id: 25, name: "神聖羅勒 (Tulsi)", category: "茶飲香草", latin: "Ocimum tenuiflorum · 印度養生", price: 240,
+                sun: "日照：全日照", water: "水分：保持濕潤", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1618164436241-4473940d1f5c?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "阿育吠陀傳統養生聖草，帶有丁香與溫暖辛香氣息，常用於沖泡養生草本茶與泰式打拋料理。",
+                fullDesc: "在印度文化中被尊稱為「植物女王」，富含天然適應原成分，沖泡為熱花草茶飲用能撫平身心壓力並增強自然防護力。"
+            },
+            {
+                id: 26, name: "西洋菜 / 水芥菜", category: "料理香草", latin: "Nasturtium officinale · 養生蔬菜", price: 190,
+                sun: "日照：半日照", water: "水分：極度濕潤", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "口感爽脆，帶有天然芥末般的微微辛辣感，富含維生素與礦物質，適合做養生濃湯與鮮採沙拉。",
+                fullDesc: "喜好水流與高濕度環境，嫩莖葉帶有類似山葵的微辣清爽口感，在歐洲廣泛應用於西式奶油濃湯、鮮肉佐餐沙拉與健康蔬果汁。"
+            },
+            {
+                id: 27, name: "琉璃苣 (Borage)", category: "芳香觀賞", latin: "Borago officinalis · 花藝觀賞", price: 260,
+                sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "開出絕美夢幻的星形藍紫色小花，花朵與嫩葉皆帶有小黃瓜般的清涼口感，花藝與調酒極佳觀賞品。",
+                fullDesc: "被譽為「勇氣之草」，盛開時整株點綴著璀璨如藍星般的美麗花朵，是花園中最受蜂鳥與蜜蜂喜愛的蜜源植物與景觀焦點。"
+            },
+            {
+                id: 28, name: "金盞花 (Calendula)", category: "芳香觀賞", latin: "Calendula officinalis · 園藝觀賞", price: 210,
+                sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "金黃與亮橘色的花瓣充滿溫暖陽光活力，具備極高的園藝景觀價值，金黃花瓣亦可用於料理染色與保養。",
+                fullDesc: "耀眼奪目的金色花朵宛如一輪溫暖的小太陽，能為陽台與花園帶來滿滿生機，花瓣曬乾後亦可用於調配花草茶與製作天然草本護膚膏。"
+            },
+            {
+                id: 29, name: "神香草 (Hyssop)", category: "芳香觀賞", latin: "Hyssopus officinalis · 古典景觀", price: 250,
+                sun: "日照：全日照", water: "水分：乾燥澆透", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "古老歷史的淨化香草，開有密集深藍紫色花穗，全株帶有薄荷與樟木清香，適合花園邊界矮籬美化。",
+                fullDesc: "自古典時代起即被視為淨化環境與心靈的聖草，挺拔的花莖上密生深藍紫色花朵，是歐洲古典香草園中極具歷史質感的景觀花卉。"
+            },
+            {
+                id: 30, name: "甜葉菊 (Stevia)", category: "茶飲香草", latin: "Stevia rebaudiana · 天然代糖", price: 200,
+                sun: "日照：全日照", water: "水分：適中澆透", level: "難易度：簡單新手",
+                img: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=600&q=80",
+                shortDesc: "天然零熱量甜味香草，葉片甜度為蔗糖的數十倍，摘採一片鮮葉放入任何花草茶中即可天然提甜。",
+                fullDesc: "天然健康的無熱量甜味植物，鮮採或乾燥葉片均可直接投入黑咖啡、花草茶或無糖冷飲中，帶來溫和不負擔的自然甜美滋味。"
             }
         ];
 
-        // 動態補充至30項真實香草
-        const extraHerbs = [
-            { name: "蝦夷蔥 (Chives)", latin: "Allium schoenoprasum", price: 170, img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80", desc: "細長管狀葉片帶有細緻溫和的洋蔥細香，適合拌入奶油、歐姆蛋與湯品點綴。" },
-            { name: "茵陳蒿 / 龍蒿 (Tarragon)", latin: "Artemisia dracunculus", price: 270, img: "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=600&q=80", desc: "法式四大法寶香草之一，帶有甘草與茴香的優雅獨特氣息，是法式法式蛋黃醬的主角。" },
-            { name: "斑葉檸檬百里香", latin: "Thymus citriodorus", price: 230, img: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=600&q=80", desc: "金邊斑葉極具觀賞性，兼具百里香草本辛香與檸檬清爽，適合煎魚與海鮮烤物。" },
-            { name: "紫葉羅勒 (Purple Basil)", latin: "Ocimum basilicum purpurascens", price: 210, img: "https://images.unsplash.com/photo-1618164436241-4473940d1f5c?auto=format&fit=crop&w=600&q=80", desc: "深紫紅色的亮麗葉片，氣味比綠羅勒稍微濃郁，浸泡香草醋可呈現迷人粉紅色澤。" },
-            { name: "鳳梨鼠尾草 (Pineapple Sage)", latin: "Salvia elegans", price: 250, img: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=600&q=80", desc: "揉碎葉片會散發令人驚艷的熱帶鳳梨水果香氣，秋季開出鮮紅花朵，適合調飲甜點。" },
-            { name: "甜香蘿勒 (Opal Basil)", latin: "Ocimum basilicum var.", price: 200, img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80", desc: "溫和無辛辣感，適合直接撕碎加入夏日水果沙拉或義大利生菜盤中增添香氣。" },
-            { name: "蘋果薄荷 (Apple Mint)", latin: "Mentha suaveolens", price: 180, img: "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=600&q=80", desc: "圓潤天鵝絨微毛葉片，帶有青蘋果與薄荷混合的清甜感，適合泡茶與擺盤。" },
-            { name: "巧克力薄荷 (Chocolate Mint)", latin: "Mentha x piperita 'Chocolate'", price: 220, img: "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?auto=format&fit=crop&w=600&q=80", desc: "深色葉脈與莖幹，帶有類似薄荷巧克力點心的甜美可可香氣，烘焙必備。" },
-            { name: "葡萄柚薄荷 (Grapefruit Mint)", latin: "Mentha piperita 'Grapefruit'", price: 220, img: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80", desc: "寬大葉片散發出鮮明的柑橘與葡萄柚果香，調製冰涼氣泡水極度解渴。" },
-            { name: "神聖羅勒 (Holy Basil / Tulsi)", latin: "Ocimum tenuiflorum", price: 240, img: "https://images.unsplash.com/photo-1618164436241-4473940d1f5c?auto=format&fit=crop&w=600&q=80", desc: "印度傳統養生聖草，帶有丁香與辛香氣息，常用於泰式打拋肉與養生草本茶。" },
-            { name: "西洋菜 / 水芥菜 (Watercress)", latin: "Nasturtium officinale", price: 190, img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80", desc: "口感爽脆，帶有天然哇沙米般的微辣刺激感，富含營養，適合做濃湯與沙拉。" },
-            { name: "琉璃苣 (Borage)", latin: "Borago officinalis", price: 260, img: "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=600&q=80", desc: "開出絕美星形藍色小花，葉片與花朵皆帶有黃瓜般的清爽口感，可用於調酒凍結晶。" },
-            { name: "金盞花 (Calendula)", latin: "Calendula officinalis", price: 210, img: "https://images.unsplash.com/photo-1589707223376-78c7b805c87e?auto=format&fit=crop&w=600&q=80", desc: "金黃色的花瓣富含葉黃素，可用於料理染色、泡茶或製作天然舒緩肌膚膏。" },
-            { name: "神香草 (Hyssop)", latin: "Hyssopus officinalis", price: 250, img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80", desc: "古老歷史的淨化香草，開藍紫色花穗，帶有薄荷與薄荷樟腦氣息，適合燉菜調味。" },
-            { name: "甜葉菊 (Stevia)", latin: "Stevia rebaudiana", price: 200, img: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=600&q=80", desc: "天然無熱量甜味劑，葉片甜度為蔗糖的數十倍，摘採一片放入花草茶中即可天然提甜。" }
-        ];
-
-        extraHerbs.forEach((item, idx) => {
-            products.push({
-                id: 16 + idx,
-                name: item.name,
-                latin: `${item.latin} · 特選香草`,
-                price: item.price,
-                sun: "日照：全日照",
-                water: "水分：適中澆透",
-                level: "難易度：簡單新手",
-                img: item.img,
-                shortDesc: item.desc,
-                fullDesc: `${item.desc}\n\n【栽培與應用】本品種植株於北歐有機栽培體系中長成，具備絕佳適應力與濃郁天然揮發油。適合放置於陽台、廚房窗台等通風良好的環境。生長期間按時補充水分與充沛陽光，即可定時採收新鮮葉片用於各類家庭料理、手作點心、芳香調飲或居家綠化擺設，為生活注入豐富的自然綠意與健康風味。`
-            });
-        });
-
+        let currentCategory = 'all';
         let cart = [];
 
-        // 渲染商品列表
+        // 渲染商品列表（依分類過濾）
         function renderProducts() {
             const grid = document.getElementById('productGrid');
-            grid.innerHTML = products.map(p => `
+            
+            const filteredProducts = currentCategory === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentCategory);
+
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #666; font-size: 1.1rem;">尚無此分類商品</div>';
+                return;
+            }
+
+            grid.innerHTML = filteredProducts.map(p => `
                 <div class="product-card">
                     <img src="${p.img}" alt="${p.name}" class="product-img" loading="lazy">
                     <div class="product-info">
+                        <span class="product-category-tag">${p.category}</span>
                         <div class="product-title">${p.name}</div>
                         <div class="product-short-desc">${p.shortDesc}</div>
                         <div class="product-bottom">
@@ -783,6 +959,20 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // 分類篩選切換功能
+        function filterCategory(category, btnElement) {
+            currentCategory = category;
+            
+            // 更新按鈕 active 狀態
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+
+            renderProducts();
         }
 
         // 開啟詳情 Modal
